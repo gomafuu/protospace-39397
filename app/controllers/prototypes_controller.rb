@@ -1,7 +1,8 @@
 class PrototypesController < ApplicationController
-
   before_action :authenticate_user!, only: [:new, :edit, :destroy]
+  before_action :set_prototype, only: [:edit, :show]
   before_action :no_match, only: [:edit]
+
   def index
     @prototypes = Prototype.all
   end
@@ -21,13 +22,11 @@ class PrototypesController < ApplicationController
   end
 
   def show
-    @prototype = Prototype.find(params[:id])
     @comment = Comment.new
     @comments = @prototype.comments.includes(:user)
   end
 
   def edit
-    @prototype = Prototype.find(params[:id])
   end
 
   def update
@@ -54,8 +53,12 @@ class PrototypesController < ApplicationController
     merge(user_id: current_user.id)
   end
 
+  def set_prototype
+    @prototype = Prototype.find(params[:id])  
+  end
+
   def no_match
-    unless @prototype && current_user.id == @prototype.user_id
+    unless current_user.id == @prototype.user_id
       redirect_to root_path
     end
   end
